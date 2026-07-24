@@ -1,76 +1,34 @@
 const jwt = require("jsonwebtoken");
 
-const registerUser = async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
+const protect = (req, res, next) => {
+  let token;
 
-    // Validation
-    if (!name || !email || !password) {
-      return res.status(400).json({
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+      req.user = decoded;
+
+      next();
+    } catch (error) {
+      return res.status(401).json({
         success: false,
-        message: "All fields are required",
+        message: "Not Authorized, Invalid Token",
       });
     }
+  }
 
-    // Dummy Response (MongoDB baad me)
-    res.status(201).json({
-      success: true,
-      message: "Validation Successful",
-      data: {
-        name,
-        email,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
+  if (!token) {
+    return res.status(401).json({
       success: false,
-      message: "Server Error",
+      message: "No Token Found",
     });
   }
 };
 
-const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Validation
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and Password are required",
-      });
-    }
-
-    // Dummy JWT Token
-    const token = jwt.sign(
-      {
-        id: "12345",
-        email: email,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
-    );
-
-    res.status(200).json({
-      success: true,
-      message: "Login Successful",
-      token,
-    });
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
-  }
-};
-
-module.exports = {
-  registerUser,
-  loginUser,
-};
+module.exports = protect;
