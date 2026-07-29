@@ -17,15 +17,17 @@ app.use(express.json());
 
 
 // Routes Import
+const doctorRoutes = require("./routes/doctorRoutes");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
-const doctorRoutes = require("./routes/doctorRoutes");
+const appointmentRoutes = require("./routes/appointmentRoutes");
 
 
 // Routes Use
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/doctor", doctorRoutes);
+app.use("/api/appointment", appointmentRoutes);
 
 
 // Test Route

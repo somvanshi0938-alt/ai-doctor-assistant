@@ -1,27 +1,22 @@
 const express = require("express");
 const router = express.Router();
 
-const protect = require("../middleware/authMiddleware");
-
 const {
-  createDoctorProfile,
+  createDoctor,
   getAllDoctors,
+  searchDoctors,
+  getDoctorById
 } = require("../controllers/doctorController");
 
 
 // Create Doctor Profile
-router.post(
-  "/profile",
-  protect,
-  createDoctorProfile
-);
+router.post("/", createDoctor);
 
 
 // Get All Doctors
-router.get(
-  "/",
-  getAllDoctors
-);
+router.get("/", getAllDoctors);
+router.get("/search", searchDoctors);
+router.get("/:id", getDoctorById);
 
 
 module.exports = router;

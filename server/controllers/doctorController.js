@@ -2,8 +2,9 @@ const Doctor = require("../models/Doctor");
 
 
 // Create Doctor Profile
-const createDoctorProfile = async (req, res) => {
+const createDoctor = async (req, res) => {
   try {
+
     const {
       specialization,
       experience,
@@ -33,11 +34,13 @@ const createDoctorProfile = async (req, res) => {
 
 
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: "Server Error",
       error: error.message,
     });
+
   }
 };
 
@@ -53,6 +56,7 @@ const getAllDoctors = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      count: doctors.length,
       doctors,
     });
 
@@ -70,7 +74,83 @@ const getAllDoctors = async (req, res) => {
 
 
 
+// Search Doctors
+const searchDoctors = async (req, res) => {
+  try {
+
+    const { specialization, location } = req.query;
+
+    let filter = {};
+
+
+    if (specialization) {
+      filter.specialization = specialization;
+    }
+
+
+    if (location) {
+      filter.location = location;
+    }
+
+
+    const doctors = await Doctor.find(filter)
+      .populate("userId", "name email");
+
+
+    res.status(200).json({
+      success: true,
+      count: doctors.length,
+      doctors,
+    });
+
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message,
+    });
+
+  }
+};
+
+
+// Get Single Doctor Details
+const getDoctorById = async (req, res) => {
+  try {
+
+    const doctor = await Doctor.findById(req.params.id)
+      .populate("userId", "name email");
+
+
+    if (!doctor) {
+      return res.status(404).json({
+        success: false,
+        message: "Doctor not found"
+      });
+    }
+
+
+    res.status(200).json({
+      success: true,
+      doctor
+    });
+
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
+      error: error.message
+    });
+
+  }
+};
 module.exports = {
-  createDoctorProfile,
+  createDoctor,
   getAllDoctors,
+  searchDoctors,
+  getDoctorById,
 };
